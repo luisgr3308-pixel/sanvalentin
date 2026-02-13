@@ -57,7 +57,6 @@
             position: fixed;
             top: 50%;
             transform: translateY(-50%);
-            /* Tamaño más grande y rectangular */
             width: 200px; 
             height: 320px;
             cursor: pointer;
@@ -65,13 +64,10 @@
             transition: all 0.3s ease;
             border-radius: 10px;
             overflow: hidden;
-            
-            /* Tira LED Dorada */
             border: 3px solid #d4af37;
             box-shadow: 0 0 15px #d4af37, inset 0 0 10px rgba(212, 175, 55, 0.5);
         }
 
-        /* Brillo extra al pasar el mouse */
         .foto-lateral:hover { 
             transform: translateY(-50%) scale(1.05); 
             box-shadow: 0 0 30px #d4af37, inset 0 0 20px rgba(212, 175, 55, 0.8);
@@ -118,26 +114,46 @@
         #btnSi { background: #b22222; color: white; border: 1px solid #d4af37; }
         #btnNo { background: #444; color: #fff; position: absolute; }
         #btnRegresar { margin-top: 15px; background: transparent; color: #aaa; border: 1px solid #444; font-size: 0.8rem; }
+
+        /* --- AJUSTES PARA CELULARES 📱 --- */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto; 
+                height: auto;
+                padding: 20px 0;
+                display: block; /* Permite que los elementos se apilen */
+            }
+
+            #canvas-fondo {
+                height: 100%;
+            }
+
+            .card {
+                width: 90%; 
+                margin: 20px auto;
+                position: relative;
+            }
+
+            .foto-lateral {
+                position: relative; 
+                top: 0;
+                transform: none;
+                width: 85%;
+                height: 300px;
+                margin: 20px auto; 
+                display: block;
+            }
+
+            #izq, #der {
+                left: auto;
+                right: auto;
+            }
+        }
     </style>
 </head>
 <body>
 
     <canvas id="canvas-fondo"></canvas>
-
-    <div class="foto-lateral" id="izq" onclick="mostrarMensaje(1)">
-        <img src="WhatsApp Image 2026-02-12 at 10.46.15 PM.jpeg" alt="Nosotros">
-    </div>
-
-    <div class="foto-lateral" id="der" onclick="mostrarMensaje(2)">
-        <img src="WhatsApp Image 2026-02-12 at 10.46.16 PM.jpeg" alt="Nosotros">
-    </div>
-
-    <div class="overlay" id="overlay">
-        <div class="mensaje-emergente">
-            <p id="texto-emergente"></p>
-            <button class="btn-cerrar" onclick="cerrarMensaje()">Cerrar ❤️</button>
-        </div>
-    </div>
 
     <div class="card" id="main-card">
         <div class="foto-perfil">
@@ -151,6 +167,21 @@
         <div class="botones">
             <button id="btnSi">¡SÍ!</button>
             <button id="btnNo">No</button>
+        </div>
+    </div>
+
+    <div class="foto-lateral" id="izq" onclick="mostrarMensaje(1)">
+        <img src="WhatsApp Image 2026-02-12 at 10.46.15 PM.jpeg" alt="Nosotros">
+    </div>
+
+    <div class="foto-lateral" id="der" onclick="mostrarMensaje(2)">
+        <img src="WhatsApp Image 2026-02-12 at 10.46.16 PM.jpeg" alt="Nosotros">
+    </div>
+
+    <div class="overlay" id="overlay">
+        <div class="mensaje-emergente">
+            <p id="texto-emergente"></p>
+            <button class="btn-cerrar" onclick="cerrarMensaje()">Cerrar ❤️</button>
         </div>
     </div>
 
