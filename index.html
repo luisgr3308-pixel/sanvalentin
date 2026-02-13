@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para mi Werita</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            background: radial-gradient(circle, #4a0404 0%, #000000 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #canvas-fondo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Tarjeta Principal */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid #d4af37;
+            text-align: center;
+            z-index: 10;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
+            max-width: 400px;
+            transition: all 0.5s ease;
+        }
+
+        h1 { color: #fff; text-shadow: 2px 2px #b22222; margin: 15px 0; font-size: 1.8rem; }
+        p { color: #eee; font-size: 1rem; line-height: 1.4; }
+
+        .foto-perfil {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            border: 3px solid #d4af37;
+            overflow: hidden;
+        }
+
+        .foto-perfil img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Fotos Laterales con Efecto Tira LED */
+        .foto-lateral {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            /* Tamaño más grande y rectangular */
+            width: 200px; 
+            height: 320px;
+            cursor: pointer;
+            z-index: 15;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            overflow: hidden;
+            
+            /* Tira LED Dorada */
+            border: 3px solid #d4af37;
+            box-shadow: 0 0 15px #d4af37, inset 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Brillo extra al pasar el mouse */
+        .foto-lateral:hover { 
+            transform: translateY(-50%) scale(1.05); 
+            box-shadow: 0 0 30px #d4af37, inset 0 0 20px rgba(212, 175, 55, 0.8);
+        }
+
+        .foto-lateral img { width: 100%; height: 100%; object-fit: cover; }
+
+        #izq { left: 40px; }
+        #der { right: 40px; }
+
+        /* Overlay para el mensaje */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            display: none; 
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .mensaje-emergente {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .mensaje-emergente p { color: #333; font-size: 1.3rem; font-weight: 500; }
+        .btn-cerrar { margin-top: 20px; background: #b22222; color: white; padding: 12px 25px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold; }
+
+        @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* Botones */
+        .botones { margin-top: 25px; display: flex; justify-content: center; gap: 15px; }
+        button { padding: 10px 25px; border-radius: 50px; border: none; cursor: pointer; font-weight: bold; }
+        #btnSi { background: #b22222; color: white; border: 1px solid #d4af37; }
+        #btnNo { background: #444; color: #fff; position: absolute; }
+        #btnRegresar { margin-top: 15px; background: transparent; color: #aaa; border: 1px solid #444; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas-fondo"></canvas>
+
+    <div class="foto-lateral" id="izq" onclick="mostrarMensaje(1)">
+        <img src="WhatsApp Image 2026-02-12 at 10.46.15 PM.jpeg" alt="Nosotros">
+    </div>
+
+    <div class="foto-lateral" id="der" onclick="mostrarMensaje(2)">
+        <img src="WhatsApp Image 2026-02-12 at 10.46.16 PM.jpeg" alt="Nosotros">
+    </div>
+
+    <div class="overlay" id="overlay">
+        <div class="mensaje-emergente">
+            <p id="texto-emergente"></p>
+            <button class="btn-cerrar" onclick="cerrarMensaje()">Cerrar ❤️</button>
+        </div>
+    </div>
+
+    <div class="card" id="main-card">
+        <div class="foto-perfil">
+            <img src="WhatsApp Image 2026-02-12 at 10.37.49 PM.jpeg" alt="Perfil">
+        </div>
+        <h1 id="titulo">¿Quieres ser mi San Valentín? ❤️</h1>
+        <p id="mensaje">
+            Hoy 25 de enero que es cuando estoy haciendo esta página, 
+            quisiera pedirte si quieres ser mi san valentín este 14 de Febrero.
+        </p>
+        <div class="botones">
+            <button id="btnSi">¡SÍ!</button>
+            <button id="btnNo">No</button>
+        </div>
+    </div>
+
+    <script>
+        const overlay = document.getElementById('overlay');
+        const textoE = document.getElementById('texto-emergente');
+
+        function mostrarMensaje(id) {
+            overlay.style.display = 'flex';
+            if(id === 1) {
+                textoE.innerText = "Los momentos que paso contigo son los más increíbles y nunca me cansaré de observar esos ojos tan hermosos que tienes 🥺💗";
+            } else {
+                textoE.innerText = "Eres la niña que más me hace feliz, con su loquita forma de ser logró enamorarme de ella, sin maquillaje ni perfumes, solo ella, y ella eres tú 💗🥺";
+            }
+        }
+
+        function cerrarMensaje() { overlay.style.display = 'none'; }
+
+        const canvas = document.getElementById('canvas-fondo');
+        const ctx = canvas.getContext('2d');
+        let particulas = [];
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particula {
+            constructor(x, y, vx, vy, tam, esExplosion = false) {
+                this.x = x; this.y = y; this.vx = vx; this.vy = vy;
+                this.tam = tam; this.opacidad = 1; this.esExplosion = esExplosion;
+            }
+            dibujar() {
+                ctx.globalAlpha = this.opacidad;
+                ctx.fillStyle = '#b22222';
+                ctx.font = `${this.tam}px serif`;
+                ctx.fillText('❤️', this.x, this.y);
+            }
+            actualizar() {
+                this.x += this.vx; this.y += this.vy;
+                if (this.esExplosion) this.opacidad -= 0.008;
+                else if (this.y < -20) this.y = canvas.height + 20;
+            }
+        }
+
+        for (let i = 0; i < 40; i++) {
+            particulas.push(new Particula(Math.random()*canvas.width, Math.random()*canvas.height, (Math.random()-0.5)*0.5, -Math.random()*1.5-0.5, Math.random()*15+10));
+        }
+
+        function animar() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particulas.forEach((p, i) => { p.actualizar(); p.dibujar(); if (p.opacidad <= 0) particulas.splice(i, 1); });
+            requestAnimationFrame(animar);
+        }
+        animar();
+
+        const btnNo = document.getElementById('btnNo');
+        const btnSi = document.getElementById('btnSi');
+
+        btnNo.addEventListener('mouseover', () => {
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 50);
+            btnNo.style.left = x + 'px'; btnNo.style.top = y + 'px';
+        });
+
+        btnSi.addEventListener('click', () => {
+            for (let i = 0; i < 80; i++) {
+                particulas.push(new Particula(window.innerWidth/2, window.innerHeight/2, (Math.random()-0.5)*20, (Math.random()-0.5)*20, Math.random()*30+15, true));
+            }
+            document.getElementById('titulo').innerText = '¡ERES MI WERITA! 🥰';
+            document.getElementById('mensaje').innerHTML = `Contigo lo tengo todo y de verdad, no quiero que nunca me llegues a faltar. <br>¡Te amo muchísimo! 🌹✨<br><button id="btnRegresar">Regresar</button>`;
+            btnNo.style.display = 'none'; btnSi.style.display = 'none';
+            document.querySelector('.card').style.borderColor = '#ff0000';
+            
+            document.getElementById('btnRegresar').addEventListener('click', () => {
+                alert("⚠️ Error mi amor, te la pelaste, ya tomaste la decisión y yo seré tu san valentín.");
+            });
+        });
+    </script>
+</body>
+</html>
